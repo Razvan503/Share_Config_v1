@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="icon" href="/images/favicon.png" type="image/x-icon">
+  <title>Sign In</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body
+        class="bg-gray-900 min-h-screen flex items-center justify-center text-gray-200"
+>
+<div class="max-w-md w-full space-y-8 p-8">
+  <div class="bg-gray-800 rounded-lg shadow-lg p-8">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h2 class="text-3xl font-bold text-white mb-2">Welcome back</h2>
+      <p class="text-gray-400">Please sign in to your account</p>
+    </div>
+
+    <!-- Form -->
+    <form id="signinForm" class="space-y-6" novalidate>
+      <!-- Username Field -->
+      <div>
+        <label
+                for="username"
+                class="block text-sm font-medium text-gray-300 mb-2"
+        >
+          Username
+        </label>
+        <input
+                id="username"
+                name="username"
+                maxlength="25"
+                class="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-500 bg-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter your username"
+        />
+        <p id="usernameError" class="text-red-500 text-sm mt-1 hidden"></p>
+      </div>
+
+      <!-- Password Field -->
+      <div>
+        <label
+                for="password"
+                class="block text-sm font-medium text-gray-300 mb-2"
+        >
+          Password
+        </label>
+        <input
+                id="password"
+                name="password"
+                type="password"
+                class="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-500 bg-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter your password"
+        />
+        <p id="passwordError" class="text-red-500 text-sm mt-1 hidden"></p>
+      </div>
+
+      <!-- Remember me & Forgot password -->
+
+      <!-- Sign in button -->
+      <button
+              type="submit"
+              class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:ring-offset-gray-900 transition duration-200"
+      >
+        Sign in
+      </button>
+
+      <!-- API Error -->
+      <p id="apiError" class="text-red-500 text-sm mt-3 hidden text-center"></p>
+    </form>
+
+    <!-- Sign up link -->
+    <p class="mt-6 text-center text-sm text-gray-400">
+      Don't have an account?
+      <a
+              href="#"
+              class="font-medium text-blue-400 hover:text-blue-300 transition-colors"
+      >
+        Sign up
+      </a>
+    </p>
+  </div>
+</div>
+
+<script>
+  document
+          .getElementById("signinForm")
+          .addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            let valid = true;
+
+            // Get form values
+            const username = document.getElementById("username");
+            const password = document.getElementById("password");
+
+            // Error elements
+            const usernameError = document.getElementById("usernameError");
+            const passwordError = document.getElementById("passwordError");
+            const apiError = document.getElementById("apiError");
+
+            // Reset errors
+            [username, password].forEach((input) =>
+                    input.classList.remove("border-red-500")
+            );
+            usernameError.classList.add("hidden");
+            passwordError.classList.add("hidden");
+            apiError.classList.add("hidden");
+
+            // Required field checks
+            if (!username.value.trim()) {
+              usernameError.textContent = "Username is required.";
+              usernameError.classList.remove("hidden");
+              username.classList.add("border-red-500");
+              valid = false;
+            }
+            if (!password.value.trim()) {
+              passwordError.textContent = "Password is required.";
+              passwordError.classList.remove("hidden");
+              password.classList.add("border-red-500");
+              valid = false;
+            }
+
+            // Username format validation
+            const usernameRegex = /^[A-Za-z0-9]{1,25}$/;
+            if (username.value && !usernameRegex.test(username.value.trim())) {
+              usernameError.textContent =
+                      "Username can only contain letters and numbers, max 25 characters.";
+              usernameError.classList.remove("hidden");
+              username.classList.add("border-red-500");
+              valid = false;
+            }
+
+            if (!valid) return;
+
+            // Send data to API
+            try {
+              const response = await fetch("http://localhost:8080/api/login", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  username: username.value.trim(),
+                  password: password.value,
+                }),
+              });
+
+              if (!response.ok) {
+                apiError.textContent = "Invalid credentials. Please try again.";
+                apiError.classList.remove("hidden");
+              } else {
+                window.location.href = '/home';
+              }
+            } catch (error) {
+              apiError.textContent = "An error occurred. Please try again later.";
+              apiError.classList.remove("hidden");
+            }
+          });
+</script>
+</body>
+</html>

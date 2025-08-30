@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <link rel="icon" href="/images/favicon.png" type="image/x-icon">
+    <title>My Account</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen p-6">
+<div class="max-w-5xl mx-auto space-y-8">
+
+    <!-- User Info -->
+    <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
+        <h1 class="text-3xl font-bold mb-4">My Account</h1>
+        <div class="space-y-2 text-lg">
+            <p><span class="font-semibold text-gray-300">Username:</span> <span id="username">Loading...</span></p>
+            <p><span class="font-semibold text-gray-300">Email:</span> <span id="email">Loading...</span></p>
+        </div>
+    </div>
+
+    <!-- Articles Section -->
+    <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
+        <h2 class="text-2xl font-bold mb-6">My Configs</h2>
+        <div id="articlesList" class="space-y-4">
+            <p class="text-gray-400">Loading articles...</p>
+        </div>
+    </div>
+
+    <!-- Delete Account -->
+    <div class="text-center">
+        <button
+                onclick="deleteAccount()"
+                class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg hover:shadow-red-500/30">
+                 Delete My Account
+        </button>
+    </div>
+</div>
+
+<!-- Notification -->
+<div
+        id="notification"
+        class="fixed top-5 right-5 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 opacity-0 transition-opacity duration-500"
+></div>
+
+<script>
+    const API_BASE = "/api"; // Use your application's API base URL
+
+    function showNotification(message, type) {
+        const notification = document.getElementById("notification");
+        notification.innerHTML =
+            type === "success"
+                ? `<span class="text-green-500 text-xl">✅</span> <span>${message}</span>`
+                : `<span class="text-red-500 text-xl">❌</span> <span>${message}</span>`;
+
+        notification.className =
+            "fixed top-5 right-5 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 " +
+            (type === "success"
+                ? "bg-green-800 text-green-100"
+                : "bg-red-800 text-red-100");
+
+        notification.style.opacity = "1";
+        setTimeout(() => {
+            notification.style.opacity = "0";
+        }, 2500);
+    }
+
+    // Fetch all account data in one call
+    async function fetchAccountData() {
+        try {
+            const res = await fetch(`https://shareconfig.onrender.com/api/myaccount`);
+            if (!res.ok) throw new Error('Failed to fetch account data');
+            
+            const data = await res.json();
+
+            // Populate user info
+            document.getElementById("username").textContent = data.username;
+            document.getElementById("email").textContent = data.email;
+
+            // Populate articles
+            const articles = data.configs;
+            const container = document.getElementById("articlesList");
+            container.innerHTML = "";
+
+            if (!articles || articles.length === 0) {
+                container.innerHTML = `<p class="text-gray-400">No articles posted yet.</p>`;
+                return;
+            }
+
+            articles.forEach(article => {
+                const articleEl = document.createElement("div");
+                articleEl.className = "bg-gray-700 hover:bg-gray-600 transition p-5 rounded-lg shadow flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border border-gray-600 hover:border-blue-500";
+
+                articleEl.innerHTML = `
+                    <div>
+                      <p class="text-sm text-gray-400">ID: ${article.id}</p>
+                      <h3 class="text-lg font-semibold">${article.title}</h3>
+                    </div>
+                    <div class="flex gap-3">
+                      <a href="/config/${article.id}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition shadow hover:shadow-blue-500/30">
+                        View
+                      </a>
+                      <button onclick="deleteArticle(${article.id}, this)" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition shadow hover:shadow-red-500/30">
+                        Delete
+                      </button>
+                    </div>
+                  `;
+                container.appendChild(articleEl);
+            });
+        } catch (err) {
+            showNotification(err.message || "Failed to load account info", "error");
+        }
+    }
+
+    // Delete article
+    async function deleteArticle(id, btn) {
+        if (!confirm(`Are you sure you want to delete article ID ${id}?`)) return;
+
+        const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        try {
+            const res = await fetch(`/api/deleteconfig`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [header]: token,
+                },
+                body: JSON.stringify({ id: id }),
+            });
+
+            if (res.ok) {
+                showNotification(`Article ${id} deleted successfully`, 'success');
+                btn.closest('.bg-gray-700').remove();
+            } else {
+                const error = await res.json();
+                showNotification(error.message || `Failed to delete article ${id}`, 'error');
+            }
+        } catch (err) {
+            showNotification(`An error occurred: ${err.message}`, 'error');
+        }
+    }
+
+    // Delete account
+    async function deleteAccount() {
+        if (!confirm("Are you sure you want to delete your account? This cannot be undone.")) return;
+
+        const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        try {
+            const res = await fetch(`/api/deleteaccount`, {
+                method: 'DELETE',
+                headers: {
+                    [header]: token,
+                },
+            });
+
+            if (res.ok) {
+                showNotification('Account deleted successfully', 'success');
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+            } else {
+                const error = await res.json();
+                showNotification(error.message || 'Failed to delete account', 'error');
+            }
+        } catch (err) {
+            showNotification(`An error occurred: ${err.message}`, 'error');
+        }
+    }
+
+    // Init
+    fetchAccountData();
+</script>
+</body>
+</html>

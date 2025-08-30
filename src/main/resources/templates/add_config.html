@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>Share Config</title>
+
+    <link rel="icon" href="/images/favicon.png" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col items-center p-6">
+
+<div class="bg-gray-800 shadow-lg rounded-lg p-8 w-full max-w-2xl">
+    <h1 class="text-2xl font-bold mb-6">Submit Your Article</h1>
+
+    <form id="articleForm" class="space-y-5">
+        <!-- Title -->
+        <div>
+            <label class="block font-medium mb-2">Title</label>
+            <input
+                    type="text"
+                    name="title"
+                    required
+                    class="w-full border border-gray-600 bg-gray-700 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter article title"
+            />
+        </div>
+
+        <!-- Content -->
+        <div>
+            <label class="block font-medium mb-2">Content</label>
+            <textarea
+                    name="content"
+                    id="content"
+                    rows="6"
+                    required
+                    class="w-full border border-gray-600 bg-gray-700 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Write your article (max 300 words)"
+            ></textarea>
+            <p class="text-sm text-gray-400 mt-1">Max 300 words</p>
+        </div>
+
+        <!-- Principal Image -->
+        <div>
+            <label class="block font-medium mb-2">Principal Image Link (Required)</label>
+            <input
+                    type="url"
+                    name="principalImage"
+                    required
+                    class="w-full border border-gray-600 bg-gray-700 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="https://example.com/image.jpg"
+            />
+        </div>
+
+        <!-- Additional Images -->
+        <div>
+            <label class="block font-medium mb-2">Additional Image Links (3 Required)</label>
+            <input
+                    type="url"
+                    name="image1"
+                    required
+                    class="w-full border border-gray-600 bg-gray-700 rounded-lg p-3 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Image 1 URL"
+            />
+            <input
+                    type="url"
+                    name="image2"
+                    required
+                    class="w-full border border-gray-600 bg-gray-700 rounded-lg p-3 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Image 2 URL"
+            />
+            <input
+                    type="url"
+                    name="image3"
+                    required
+                    class="w-full border border-gray-600 bg-gray-700 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Image 3 URL"
+            />
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex gap-4">
+            <button
+                    type="button"
+                    onclick="previewArticle()"
+                    class="flex-1 bg-yellow-500 text-black py-3 rounded-lg hover:bg-yellow-600 transition font-semibold"
+            >
+                Preview
+            </button>
+            <button
+                    type="submit"
+                    onclick="submitArticle(event)"
+                    class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold"
+            >
+               Upload Your Config
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Display Preview / Posted Article -->
+<div id="postedArticle" class="mt-10 w-full max-w-3xl"></div>
+
+<!-- Notification -->
+<div id="notification" class="fixed top-5 right-5 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 opacity-0 transition-opacity duration-500"></div>
+
+<script>
+    // ✅ Image URL Sanitization
+    function sanitizeImageUrl(url) {
+        try {
+            if (!url) throw new Error("Empty URL");
+
+            // Trim spaces
+            url = url.trim();
+
+            // ❌ Block any HTML tags
+            if (/[<>]/.test(url)) {
+                throw new Error("HTML tags not allowed in image URL");
+            }
+
+            // Lowercase for easier matching
+            const lower = url.toLowerCase();
+
+            // ❌ Block dangerous protocols and attributes
+            if (
+                lower.includes("javascript:") ||
+                lower.includes("data:") ||
+                lower.includes("vbscript:") ||
+                lower.includes("onerror") ||
+                lower.includes("onload")
+            ) {
+                throw new Error("Dangerous content in image URL");
+            }
+
+            // ✅ Parse URL
+            const parsed = new URL(url);
+
+            // ✅ Only allow http/https
+            if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+                throw new Error("Invalid protocol");
+            }
+
+            // ✅ Optional: whitelist domains
+
+
+            // ✅ Return safe URL
+            return parsed.href;
+        } catch {
+            // Fallback placeholder
+            return "/images/placeholder.png";
+        }
+    }
+
+    // ✅ Text Sanitization
+    function sanitizeText(str) {
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;")
+            .replace(/\//g, "&#47;");
+    }
+
+    // ✅ Validation for length, words, and allowed characters
+    function validateText(str, maxWords, maxChars) {
+        const wordCount = str.trim().split(/\s+/).length;
+        if (wordCount > maxWords) {
+            return { valid: false, error: `Exceeds ${maxWords} words` };
+        }
+        if (str.length > maxChars) {
+            return { valid: false, error: `Exceeds ${maxChars} characters` };
+        }
+        if (!/^[a-zA-Z0-9\s.,!?'"()\-]*$/.test(str)) {
+            return { valid: false, error: "Contains invalid characters" };
+        }
+        return { valid: true };
+    }
+
+    function showNotification(message, type) {
+        const notification = document.getElementById("notification");
+        notification.innerHTML =
+            type === "success"
+                ? `<span class="text-green-500 text-xl">✅</span> <span>${message}</span>`
+                : `<span class="text-red-500 text-xl">❌</span> <span>${message}</span>`;
+        notification.className =
+            "fixed top-5 right-5 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 " +
+            (type === "success"
+                ? "bg-green-800 text-green-100"
+                : "bg-red-800 text-red-100");
+        notification.style.opacity = "1";
+        setTimeout(() => {
+            notification.style.opacity = "0";
+        }, 2500);
+    }
+
+    function previewArticle() {
+        const form = document.getElementById("articleForm");
+        const formData = new FormData(form);
+
+        const rawTitle = formData.get("title");
+        const rawContent = formData.get("content");
+
+        const titleCheck = validateText(rawTitle, 75, 200);
+        if (!titleCheck.valid) {
+            showNotification(`Title error: ${titleCheck.error}`, "error");
+            return;
+        }
+
+        const contentCheck = validateText(rawContent, 300, 2000);
+        if (!contentCheck.valid) {
+            showNotification(`Content error: ${contentCheck.error}`, "error");
+            return;
+        }
+
+        const safeTitle = sanitizeText(rawTitle);
+        const safeContent = sanitizeText(rawContent);
+
+        document.getElementById("postedArticle").innerHTML = `
+          <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold mb-4">${safeTitle}</h2>
+            <img src="${sanitizeImageUrl(formData.get("principalImage"))}" alt="Principal" class="w-full h-64 object-cover rounded mb-4">
+            <p class="mb-4">${safeContent}</p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <img src="${sanitizeImageUrl(formData.get("image1"))}" class="w-full h-40 object-cover rounded">
+              <img src="${sanitizeImageUrl(formData.get("image2"))}" class="w-full h-40 object-cover rounded">
+              <img src="${sanitizeImageUrl(formData.get("image3"))}" class="w-full h-40 object-cover rounded">
+            </div>
+          </div>
+        `;
+    }
+
+    async function submitArticle(event) {
+        event.preventDefault();
+
+        const form = document.getElementById("articleForm");
+        const formData = new FormData(form);
+
+        const rawTitle = formData.get("title");
+        const rawContent = formData.get("content");
+
+        const titleCheck = validateText(rawTitle, 75, 200);
+        if (!titleCheck.valid) {
+            showNotification(`Title error: ${titleCheck.error}`, "error");
+            return;
+        }
+
+
+        const contentCheck = validateText(rawContent, 300, 2000);
+        if (!contentCheck.valid) {
+            showNotification(`Content error: ${contentCheck.error}`, "error");
+            return;
+        }
+
+        const safeTitle = sanitizeText(rawTitle);
+        const safeContent = sanitizeText(rawContent);
+
+        const articleData = {
+            title: safeTitle,
+            description: safeContent,
+            principalImage: sanitizeImageUrl(formData.get("principalImage")),
+            image1: sanitizeImageUrl(formData.get("image1")),
+            image2: sanitizeImageUrl(formData.get("image2")),
+            image3: sanitizeImageUrl(formData.get("image3"))
+        };
+
+        // ✅ Get CSRF token and header name from meta tags
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute("content");
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute("content");
+
+        try {
+            const res = await fetch("https://shareconfig.onrender.com/api/config", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    [csrfHeader]: csrfToken // ✅ Add CSRF token to request
+                },
+                body: JSON.stringify(articleData),
+            });
+
+            if (res.ok) {
+                showNotification("Article submitted successfully", "success");
+                form.reset();
+            } else {
+                showNotification("Unable to submit article", "error");
+            }
+        } catch (err) {
+            showNotification("Unable to submit article", "error");
+        }
+    }
+</script>
+
+</body>
+</html>

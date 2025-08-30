@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up</title>
+    <link rel="icon" href="/images/favicon.png" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body
+        class="bg-gray-900 min-h-screen flex items-center justify-center text-gray-200"
+>
+<div class="max-w-md w-full space-y-8 p-8">
+    <div class="bg-gray-800 rounded-lg shadow-lg p-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-white mb-2">
+                Create your account
+            </h2>
+            <p class="text-gray-400">Join us today and get started</p>
+        </div>
+
+        <!-- Form -->
+        <form id="signupForm" class="space-y-6" novalidate>
+            <!-- Email Field -->
+            <div>
+                <label
+                        for="email"
+                        class="block text-sm font-medium text-gray-300 mb-2"
+                >
+                    Email address
+                </label>
+                <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        class="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-500 bg-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Enter your email"
+                />
+                <p id="emailError" class="text-red-500 text-sm mt-1 hidden"></p>
+            </div>
+
+            <!-- Username Field -->
+            <div>
+                <label
+                        for="username"
+                        class="block text-sm font-medium text-gray-300 mb-2"
+                >
+                    Username
+                </label>
+                <input
+                        id="username"
+                        name="username"
+                        type="text"
+                        maxlength="25"
+                        class="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-500 bg-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Choose a username"
+                />
+                <p id="usernameError" class="text-red-500 text-sm mt-1 hidden"></p>
+            </div>
+
+            <!-- Password Field -->
+            <div>
+                <label
+                        for="password"
+                        class="block text-sm font-medium text-gray-300 mb-2"
+                >
+                    Password
+                </label>
+                <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        class="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-500 bg-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Create a password"
+                />
+            </div>
+
+            <!-- Confirm Password Field -->
+            <div>
+                <label
+                        for="confirm-password"
+                        class="block text-sm font-medium text-gray-300 mb-2"
+                >
+                    Confirm Password
+                </label>
+                <input
+                        id="confirm-password"
+                        name="confirm-password"
+                        type="password"
+                        class="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-500 bg-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Confirm your password"
+                />
+                <p id="passwordError" class="text-red-500 text-sm mt-1 hidden"></p>
+            </div>
+
+            <!-- Terms and conditions -->
+            <div class="flex items-start">
+                <input
+                        id="terms"
+                        name="terms"
+                        type="checkbox"
+                        class="h-4 w-4 text-blue-500 focus:ring-blue-500 border-gray-600 rounded bg-gray-700"
+                />
+                <label for="terms" class="ml-2 block text-sm text-gray-300">
+                    I want for my email to be used in crypto scams(Optional)
+                </label>
+            </div>
+
+            <!-- Sign up button -->
+            <button
+                    type="submit"
+                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:ring-offset-gray-900 transition duration-200"
+            >
+                Create Account
+            </button>
+
+            <!-- API Error -->
+            <p id="apiError" class="text-red-500 text-sm mt-3 hidden text-center"></p>
+        </form>
+
+        <!-- Sign in link -->
+        <p class="mt-6 text-center text-sm text-gray-400">
+            Already have an account?
+            <a
+                    href="/signin"
+                    class="font-medium text-blue-400 hover:text-blue-300 transition-colors"
+            >
+                Sign in
+            </a>
+        </p>
+    </div>
+</div>
+
+<script>
+    document
+        .getElementById("signupForm")
+        .addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            let valid = true;
+
+            // Get form values
+            const email = document.getElementById("email");
+            const username = document.getElementById("username");
+            const password = document.getElementById("password");
+            const confirmPassword = document.getElementById("confirm-password");
+
+            // Error elements
+            const emailError = document.getElementById("emailError");
+            const usernameError = document.getElementById("usernameError");
+            const passwordError = document.getElementById("passwordError");
+            const apiError = document.getElementById("apiError");
+
+            // Reset errors and borders
+            [email, username, password, confirmPassword].forEach((input) => {
+                input.classList.remove("border-red-500");
+            });
+            emailError.classList.add("hidden");
+            usernameError.classList.add("hidden");
+            passwordError.classList.add("hidden");
+            apiError.classList.add("hidden");
+
+            // Check required fields
+            if (!email.value.trim()) {
+                emailError.textContent = "Email is required.";
+                emailError.classList.remove("hidden");
+                email.classList.add("border-red-500");
+                valid = false;
+            }
+            if (!username.value.trim()) {
+                usernameError.textContent = "Username is required.";
+                usernameError.classList.remove("hidden");
+                username.classList.add("border-red-500");
+                valid = false;
+            }
+            if (!password.value.trim()) {
+                passwordError.textContent = "Password is required.";
+                passwordError.classList.remove("hidden");
+                password.classList.add("border-red-500");
+                valid = false;
+            }
+            if (!confirmPassword.value.trim()) {
+                passwordError.textContent = "Please confirm your password.";
+                passwordError.classList.remove("hidden");
+                confirmPassword.classList.add("border-red-500");
+                valid = false;
+            }
+
+            // Email validation: only letters, numbers, @, .
+            const emailRegex = /^[A-Za-z0-9._]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+            if (email.value && !emailRegex.test(email.value.trim())) {
+                emailError.textContent =
+                    "Invalid email format. Only letters, numbers, @, and . are allowed.";
+                emailError.classList.remove("hidden");
+                email.classList.add("border-red-500");
+                valid = false;
+            }
+
+            // Username validation: only letters and numbers, max 25 chars
+            const usernameRegex = /^[A-Za-z0-9]{1,25}$/;
+            if (username.value && !usernameRegex.test(username.value.trim())) {
+                usernameError.textContent =
+                    "Username can only contain letters and numbers, max 25 characters.";
+                usernameError.classList.remove("hidden");
+                username.classList.add("border-red-500");
+                valid = false;
+            }
+
+            // Password match check
+            if (
+                password.value &&
+                confirmPassword.value &&
+                password.value !== confirmPassword.value
+            ) {
+                passwordError.textContent = "Passwords do not match.";
+                passwordError.classList.remove("hidden");
+                password.classList.add("border-red-500");
+                confirmPassword.classList.add("border-red-500");
+                valid = false;
+            }
+
+            if (!valid) return;
+
+            // Send data to API
+            try {
+                const response = await fetch("https://shareconfig.onrender.com/api/register", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        email: email.value.trim(),
+                        username: username.value.trim(),
+                        password: password.value,
+                    }),
+                });
+
+                if (!response.ok) {
+                    apiError.textContent = "Username taken.Please use other username.";
+                    apiError.classList.remove("hidden");
+                } else {
+                    window.location.href = '/home';
+                }
+            } catch (error) {
+                apiError.textContent = "An error occurred. Please try again later.";
+                apiError.classList.remove("hidden");
+            }
+        });
+</script>
+</body>
+</html>

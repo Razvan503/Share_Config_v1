@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/images/favicon.png" type="image/x-icon">
+    <title>Share Config</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .float-animation { animation: float 6s ease-in-out infinite; }
+        .slide-in { animation: slideIn 0.3s ease-out forwards; }
+        .card-hover { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-hover:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5); }
+        .menu-line { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform-origin: center; }
+        .menu-open .menu-line:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+        .menu-open .menu-line:nth-child(2) { opacity: 0; transform: scale(0); }
+        .menu-open .menu-line:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+        .dropdown-item { transition: all 0.2s ease-out; transform: translateX(-10px); opacity: 0; }
+        .dropdown-show .dropdown-item { transform: translateX(0); opacity: 1; }
+        .dropdown-item:nth-child(1) { transition-delay: 0.1s; }
+        .dropdown-item:nth-child(2) { transition-delay: 0.15s; }
+        .dropdown-item:nth-child(3) { transition-delay: 0.2s; }
+        .dropdown-item:nth-child(4) { transition-delay: 0.25s; }
+        .dropdown-item:nth-child(5) { transition-delay: 0.3s; }
+        .dropdown-item:nth-child(6) { transition-delay: 0.35s; }
+        .dropdown-item:nth-child(7) { transition-delay: 0.4s; }
+        .dropdown-item:nth-child(8) { transition-delay: 0.45s; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-200 min-h-screen">
+
+<!-- Navigation Bar -->
+<nav class="backdrop-blur-md bg-gray-900/80 shadow-lg border-b border-gray-700 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-8 py-4">
+        <div class="flex items-center justify-between">
+            <!-- Hamburger Menu -->
+            <div class="relative">
+                <button id="menu-btn" class="menu-btn flex flex-col justify-center items-center w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 group">
+                    <div class="menu-line w-6 h-0.5 bg-white rounded-full mb-1"></div>
+                    <div class="menu-line w-6 h-0.5 bg-white rounded-full mb-1"></div>
+                    <div class="menu-line w-6 h-0.5 bg-white rounded-full"></div>
+                </button>
+
+                <!-- Dropdown Menu -->
+                <div id="dropdown-menu" class="absolute left-0 top-16 w-64 bg-gray-800/95 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-700 z-50 hidden overflow-hidden">
+                    <div class="p-2">
+                        <a href="/my-account" class="dropdown-item flex items-center px-4 py-3 text-gray-200 hover:bg-gray-700 rounded-xl transition-all duration-200 group">
+                            My Account
+                        </a>
+                        <a href="/addconfig" class="dropdown-item flex items-center px-4 py-3 text-gray-200 hover:bg-gray-700 rounded-xl transition-all duration-200 group">
+                           Add configs
+                        </a>
+                        <!-- More dropdown items here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logo -->
+            <div class="flex-1 text-center">
+                <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent hover:scale-105 transition-transform duration-300 cursor-pointer">
+                   Share Config
+                </h1>
+            </div>
+
+            <div class="w-12"></div>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section with Slider -->
+<div class="relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/10 to-pink-900/20"></div>
+    <div class="max-w-7xl mx-auto relative">
+        <div class="relative h-96 overflow-hidden">
+            <!-- Slide 1 -->
+            <div class="slide absolute inset-0 flex items-center justify-between px-8 transition-all duration-1000 opacity-100">
+                <div class="flex-1 pr-8 z-10">
+                    <h1 class="text-5xl font-bold text-white mb-6">MineGrub</h1>
+                    <p class="text-xl text-gray-300 mb-8">Boot in minecraft</p>
+                </div>
+                <div class="flex-1 float-animation">
+                    <img src="https://github.com/Lxtharia/minegrub-theme/raw/main/resources/preview_minegrub.png"
+                         class="w-full h-64 object-cover rounded-3xl shadow-2xl">
+                </div>
+            </div>
+            <!-- Slide 2 -->
+            <div class="slide absolute inset-0 flex items-center justify-between px-8 transition-all duration-1000 opacity-0">
+                <div class="flex-1 pr-8 z-10">
+                    <h1 class="text-5xl font-bold text-white mb-6">Jakoolit Hyprland</h1>
+                    <p class="text-xl text-gray-300 mb-8">The best cross platform hyprland with support from Kali to even Mint.</p>
+                </div>
+                <div class="flex-1 float-animation">
+                    <img src="https://raw.githubusercontent.com/JaKooLit/screenshots/main/Hyprland-V2-Screenshots/General/pywal-kitty.png"
+                         class="w-full h-64 object-cover rounded-3xl shadow-2xl">
+                </div>
+            </div>
+        <!-- Slide 3 -->
+            <div class="slide absolute inset-0 flex items-center justify-between px-8 transition-all duration-1000 opacity-0">
+                <div class="flex-1 pr-8 z-10">
+                    <h1 class="text-5xl font-bold text-white mb-6">NvChad</h1>
+                    <p class="text-xl text-gray-300 mb-8">One of the best Nvim configuration,created by chads and used by chads</p>
+                </div>
+                <div class="flex-1 float-animation">
+                    <img src=https://i.ytimg.com/vi/yW3ovyQCwpw/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLCUOcrj1K-hWH3PO8UDpmqJ3z0dQQ""
+                         class="w-full h-64 object-cover rounded-3xl shadow-2xl">
+                </div>
+            </div>
+        </div>
+        <!-- Slider Indicators -->
+        <div class="flex justify-center space-x-3 pb-8">
+            <button class="indicator w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-600" data-slide="0"></button>
+            <button class="indicator w-4 h-4 rounded-full bg-gray-500" data-slide="1"></button>
+            <button class="indicator w-4 h-4 rounded-full bg-gray-500" data-slide="2"></button>
+        </div>
+    </div>
+</div>
+
+<!-- Search Section -->
+<div class="max-w-7xl mx-auto px-8 py-16">
+    <div class="mb-16">
+        <div class="relative max-w-3xl mx-auto">
+            <input type="text" placeholder="Search..." class="w-full px-6 py-4 pr-14 border-2 border-gray-700 rounded-2xl bg-gray-800 text-gray-200 placeholder-gray-500">
+            <button class="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Cards -->
+    <div id="cards-container" class="space-y-8"></div>
+</div>
+
+<script>
+    let allCards = []; // store all fetched articles
+
+    // Function to create a card HTML string
+    function createCard({ id, title, description, image }) {
+        const link = `/config/${id}`;
+        return `
+        <div class="flex flex-col md:flex-row bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:scale-[1.02] transition">
+            <div class="w-full md:w-64 h-56">
+                <img src="${image}" class="w-full h-full object-cover" alt="${title}">
+            </div>
+            <div class="p-6 flex flex-col justify-between flex-1">
+                <h2 class="text-2xl font-bold text-white mb-3">${title}</h2>
+                <p class="text-gray-400 mb-4">${description || ""}</p>
+                <a href="${link}" class="self-start inline-block px-4 py-2 bg-yellow-500 text-black rounded-lg hover:bg-yellow-400">Read More</a>
+            </div>
+        </div>`;
+    }
+
+    // Render cards into container
+    function renderCards(cards) {
+        const container = document.getElementById("cards-container");
+        if (!cards.length) {
+            container.innerHTML = `<p class="text-gray-400">No results found.</p>`;
+            return;
+        }
+        container.innerHTML = cards.map(createCard).join("");
+    }
+
+    // Fetch data from API and render cards
+    async function loadCards() {
+        try {
+            const res = await fetch("https://shareconfig.onrender.com/api/home"); 
+            if (!res.ok) throw new Error("Failed to fetch cards");
+
+            const data = await res.json(); 
+            allCards = data; // store all articles
+            renderCards(allCards);
+        } catch (err) {
+            console.error(err);
+            document.getElementById("cards-container").innerHTML =
+                `<p class="text-red-500">Error loading cards. Please try again later.</p>`;
+        }
+    }
+
+    // Search function
+    function searchCards(query) {
+        query = query.toLowerCase();
+        const filtered = allCards.filter(card =>
+            card.title.toLowerCase().includes(query) ||
+            (card.description && card.description.toLowerCase().includes(query))
+        );
+        renderCards(filtered);
+    }
+
+    // Call the function when the page loads
+    loadCards();
+
+    // Attach search event listeners
+    const searchInput = document.querySelector("input[type='text']");
+    const searchButton = document.querySelector(".max-w-3xl button"); // more specific selector
+
+    // Live search as you type
+    searchInput.addEventListener("input", (e) => {
+        searchCards(e.target.value);
+    });
+
+    // Or search when clicking the button
+    searchButton.addEventListener("click", () => {
+        searchCards(searchInput.value);
+    });
+
+    // -------------------------------
+    // SLIDER LOGIC
+    // -------------------------------
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const indicators = document.querySelectorAll('.indicator');
+
+    function showSlide(index) {
+        slides.forEach((slide, i) => {
+            slide.style.opacity = i === index ? '1' : '0';
+        });
+        indicators.forEach((ind, i) => {
+            ind.className = i === index
+                ? 'indicator w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-600'
+                : 'indicator w-4 h-4 rounded-full bg-gray-500';
+        });
+    }
+
+    setInterval(() => {
+        currentSlide = (currentSlide + 1) % slides.length;
+        showSlide(currentSlide);
+    }, 5000);
+
+    indicators.forEach((ind, i) => ind.addEventListener('click', () => {
+        currentSlide = i;
+        showSlide(i);
+    }));
+
+    // -------------------------------
+    // DROPDOWN MENU LOGIC
+    // -------------------------------
+    const menuBtn = document.getElementById('menu-btn');
+    const dropdownMenu = document.getElementById('dropdown-menu');
+
+    menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menuBtn.classList.toggle('menu-open');
+        if (dropdownMenu.classList.contains('hidden')) {
+            dropdownMenu.classList.remove('hidden');
+            setTimeout(() => dropdownMenu.classList.add('dropdown-show'), 10);
+        } else {
+            dropdownMenu.classList.remove('dropdown-show');
+            setTimeout(() => dropdownMenu.classList.add('hidden'), 300);
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!menuBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+            menuBtn.classList.remove('menu-open');
+            dropdownMenu.classList.remove('dropdown-show');
+            setTimeout(() => dropdownMenu.classList.add('hidden'), 300);
+        }
+    });
+</script>
+</body>
+</html>
