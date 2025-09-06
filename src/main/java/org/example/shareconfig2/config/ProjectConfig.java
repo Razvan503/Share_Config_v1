@@ -51,7 +51,6 @@ public class ProjectConfig {
         http.csrf( c-> {
                     c.ignoringRequestMatchers("/api/login");
                     c.ignoringRequestMatchers("/api/register");
-                    c.ignoringRequestMatchers("ks/admin/config","ks/admin/user","ks/admin/killswitch");
                     c.csrfTokenRepository(csrfTokenRepository);
                     c.csrfTokenRequestHandler( new CsrfEndpointRequestHandler()
                     );
